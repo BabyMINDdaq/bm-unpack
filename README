@@ -1,0 +1,22 @@
+1. I assume that you already have a ROOT installation and ROOTSYS is set.
+
+2. To build the library do:
+  cd build
+  cmake ../
+  make
+
+3.  To run the examples do:
+  cd ../bin/
+  ./dump -f 1.daq
+
+or
+
+  ./unpack -f 1.daq
+
+use "--help" to see the other options.
+
+
+
+
+
+
