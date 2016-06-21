@@ -34,6 +34,8 @@ class MDdataWordBM : public MDdataWord {
   void Dump();
 
   uint32_t GetDataType();
+  uint32_t GetSid();
+  uint32_t GetHeadTrailId();
   uint32_t GetBoardId();
   uint32_t GetSpillTag();
   uint32_t GetSpillTime();
@@ -70,14 +72,16 @@ class MDdataWordBM : public MDdataWord {
 
   enum DWBMMask {
    DataTypeMask     = 0xF0000000,
+   SidMask          = 0x000C0000,
    BoardIdMask      = 0x0FE00000,
    SpillTagMask     = 0x0000FFFF,
    SpillTimeMask    = 0x0FFFFFFF,
    ChannelIdMask    = 0x0FE00000,
-   HitTimeMask      = 0x0000FFFF,
-   HitIdMask        = 0x000F0000,
+   HitTimeMask      = 0x00000FFF,
+   HitIdMask        = 0x001F0000,
    HitCountMask     = 0x0F800000,
-   EdgeIdMask       = 0x00100000,
+   HeadTrailIdMask  = 0x00100000,
+   EdgeIdMask       = 0x00008000,
    TriggerTimeMask  = 0x000FFFFF,
    TriggerTagMask   = 0x0FFFFFFF,
    AmplitudeIdMask  = 0x0000F000,
@@ -88,6 +92,7 @@ class MDdataWordBM : public MDdataWord {
 
   enum DWBMShift {
    DataTypeShift     = 28,
+   SidShift          = 18,
    BoardIdShift      = 21,
    SpillTagShift     = 0,
    SpillTimeShift    = 0,
@@ -95,7 +100,8 @@ class MDdataWordBM : public MDdataWord {
    HitTimeShift      = 0,
    HitIdShift        = 16,
    HitCountShift     = 23,
-   EdgeIdShift       = 20,
+   HeadTrailIdShift  = 20,
+   EdgeIdShift       = 15,
    TriggerTimeShift  = 0,
    TriggerTagShift   = 0,
    AmplitudeIdShift  = 12,

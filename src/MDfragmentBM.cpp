@@ -56,7 +56,7 @@ void MDfragmentBM::Init() {
           done = true;
       }
 
-      if ( dw.GetEdgeId() ||
+      if ( dw.GetHeadTrailId() ||
            dw.GetBoardId()  != _boardId ||
            dw.GetSpillTag() != _spillTag) {
         stringstream ss;
@@ -70,7 +70,7 @@ void MDfragmentBM::Init() {
       ++nDW;
 
       if ( dw.GetDataType() != MDdataWordBM::SpillTrailer1 ||
-           dw.GetEdgeId()   !=  1 ||
+           dw.GetHeadTrailId()   !=  1 ||
            dw.GetBoardId()  != _boardId ) {
         throw MDexception("ERROR in MDfragmentBM::Init() : The spill trailer 1 is not consistent.");
       }

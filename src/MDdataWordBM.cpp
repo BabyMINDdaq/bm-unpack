@@ -24,6 +24,16 @@ uint32_t MDdataWordBM::GetDataType() {
   return 0;
 }
 
+uint32_t MDdataWordBM::GetSid() {
+  if (IsValid())  return ( (*(uint32_t*)(_data) & SidMask ) >> SidShift );
+  return 0;
+}
+
+uint32_t MDdataWordBM::GetHeadTrailId() {
+  if (IsValid())  return ( (*(uint32_t*)(_data) & HeadTrailIdMask ) >> HeadTrailIdShift );
+  return 0;
+}
+
 uint32_t MDdataWordBM::GetBoardId() {
   if (IsValid())  return ( (*(uint32_t*)(_data) & BoardIdMask ) >> BoardIdShift );
   return 0;
@@ -104,6 +114,7 @@ ostream & operator<<(ostream &s, MDdataWordBM &dw) {
   switch (dt) {
   case MDdataWordBM::SpillHeader:
     s << "Spill Header  BoardId: " << dw.GetBoardId()
+      << "  Sid: " << dw.GetSid()
       << "  Spill Tag: " << dw.GetSpillTag();
     break;
 
@@ -112,34 +123,34 @@ ostream & operator<<(ostream &s, MDdataWordBM &dw) {
     break;
 
   case MDdataWordBM::TimeMeas:
-    s << "Channel: " << dw.GetChannelId();
-
-    if ( dw.GetEdgeId() ) s << "  Time (RE): ";
-    else s << "  Time (FE): ";
-
-    s << dw.GetTriggerTime()
+    s << "Channel: " << dw.GetChannelId()
       << "  HitId: " << dw.GetHitId();
+    if ( dw.GetEdgeId()==0 ) s << "  Time (0, RE): ";
+    else s << "  Time (1, FE): ";
+
+    s << dw.GetTriggerTime();
     break;
 
   case MDdataWordBM::ChargeMeas:
     s << "Channel: " << dw.GetChannelId()
-      << "  Charge: " << dw.GetAmplitude()
       << "  HitId: " << dw.GetHitId()
-      << "  Amplitude Id: " << dw.GetAmplitudeId();
+      << "  Amplitude Id: " << dw.GetAmplitudeId()
+      << "  Charge: " << dw.GetAmplitude();
     break;
 
   case MDdataWordBM::TrigTrailer1:
-    s << "Trigger Trailer  Gl. Trigger Tag: " << dw.GetTriggerTag();
+    s << "Trigger Trailer (1)  Gl. Trigger Tag: " << dw.GetTriggerTag();
     break;
 
   case MDdataWordBM::TrigTrailer2:
-    s << "Trigger Trailer  Hit count: " << dw.GetHitCount()
+    s << "Trigger Trailer (2)  Hit count: " << dw.GetHitCount()
       << "  Trigger Time: " << dw.GetTriggerTime();
     break;
 
   case MDdataWordBM::SpillTrailer1:
-    s << "Spill Trailer1  BoardId: " << dw.GetBoardId();
-    if (dw.GetEdgeId()==0)
+    s << "Spill Trailer (1)  BoardId: " << dw.GetBoardId()
+      << "  Sid: " << dw.GetSid();
+    if (dw.GetHeadTrailId()==0)
       s << "  Spill Tag: " << dw.GetSpillTag();
     else
       s << "  Temperature: " << dw.GetTemperature() << "  Humidity: " << dw.GetHumidity();
@@ -147,7 +158,7 @@ ostream & operator<<(ostream &s, MDdataWordBM &dw) {
     break;
 
   case MDdataWordBM::SpillTrailer2:
-    s << "Spill Trailer2 Spill time: " << dw.GetSpillTime();
+    s << "Spill Trailer (2) Spill time: " << dw.GetSpillTime();
     break;
 
   default:
