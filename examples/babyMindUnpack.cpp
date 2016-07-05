@@ -59,65 +59,56 @@ int main( int argc, char **argv ) {
   if ( argh.GetValue("file", stringBuf) != MDARGUMENT_STATUS_OK ) return -1;
   filename = stringBuf;
 
-//   std::ifstream ifs((filepath + "/" + filename).c_str());
-//   if ( ifs.fail() ) {
-//     cerr << "Can not open file " << filepath << filename << endl;
-//     return 1;
-//   }
-
-//   dataBuff = new char[64*1024*4];
-//   dataPtr  = (uint32_t*)dataBuff;
-// 
-//   ifs.read(dataBuff, 5*4);
-
   TFile rfile("histos.root", "recreate");
   TH1I  h1("h1_hit_ch", "hit channels", 100, 0, 100);
-  TH1I  h2("h2_ampl", "hit ampl.", 200, 0, 1000);
+  TH1I  h2("h2_ampl", "hit ampl.", 200, 0, 5000);
 
   MDdateFile dfile(filename, filepath);
 // Open the file and loop over events.
+  char *eventBuffer;
+  if ( dfile.open() ) { // There is a valid files to unpack
+    dfile.init();
 
-  try {
-
-    char *eventBuffer;
-    if ( dfile.open() ) { // There is a valid files to unpack
-      dfile.init();
-
-      int xEv(0);
-       do { // Loop over all spills
-        eventBuffer =  dfile.GetNextEvent();
+    int xEv(0);
+    do { // Loop over all spills
+      eventBuffer =  dfile.GetNextEvent();
+      try {
         MDfragmentBM   spill;
         spill.SetDataPtr(eventBuffer);
 
-        MDpartEventBM  event;
+        MDpartEventBM *event;
         int nTr = spill.GetNumOfTriggers();
         for (int i=0; i<nTr; ++i) {
-          uint32_t *trigPtr = spill.GetTriggerEventPtr(i);
-          event.SetDataPtr(trigPtr);
+          event = spill.GetTriggerEventPtr(i);
+//           event->Dump();
           for (int ich=0; ich<BM_FEB_NCHANNELS; ++ich) {
-            int nHits = event.GetNLeadingEdgeHits(ich);
+            int nHits = event->GetNLeadingEdgeHits(ich);
             if (nHits)
               h1.Fill(ich, nHits);
 
-            int q = event.GetHitAmplitude(ich, 'h');
+            int q = event->GetHitAmplitude(ich, 'h');
             h2.Fill(q);
           }
         }
-        ++xEv;
-//       } while (xEv < 5);
-      } while ( eventBuffer );
-    }
+      } catch (MDexception & lExc)  {
+        std::cerr <<  lExc.GetDescription() << endl
+                  << "Unpacking exception\n"
+                  << "Spill skipped!\n\n";
+      } catch(std::exception & lExc) {
+        std::cerr << lExc.what() << std::endl
+                  << "Standard exception\n"
+                  << "Spill skipped!\n\n";
+      } catch(...) {
+        std::cerr << "Unknown exception occurred...\n"
+                  << "Spill skipped!\n\n";
+      }
 
-    dfile.close();
-  } catch (MDexception & lExc)  {
-    std::cerr <<  lExc.GetDescription() << endl;
-    std::cerr << "Unpacking exception" << std::endl;// return 1;
-  } catch(std::exception & lExc) {
-    std::cerr << "Standard exception" << std::endl;
-    std::cerr << lExc.what() << std::endl;
-  } catch(...) {
-    std::cerr << "Unknown exception occurred..." << std::endl;
+      ++xEv;
+//       } while (xEv < 5);
+    } while ( eventBuffer );
   }
+
+  dfile.close();
 
   h1.Write();
   h2.Write();

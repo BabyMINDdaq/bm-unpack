@@ -42,10 +42,12 @@ class MDdataWordBM : public MDdataWord {
   uint32_t GetChannelId();
   uint32_t GetHitTime();
   uint32_t GetHitId();
+  uint32_t GetTagId();
   uint32_t GetHitCount();
   uint32_t GetEdgeId();
   uint32_t GetTriggerTime();
   uint32_t GetTriggerTag();
+  uint32_t GetTriggerTagShort();
   uint32_t GetAmplitudeId();
   uint32_t GetAmplitude();
   uint32_t GetHumidity();
@@ -78,12 +80,14 @@ class MDdataWordBM : public MDdataWord {
    SpillTimeMask    = 0x0FFFFFFF,
    ChannelIdMask    = 0x0FE00000,
    HitTimeMask      = 0x00000FFF,
-   HitIdMask        = 0x001F0000,
+   HitIdMask        = 0x001C0000,
+   TagIdMask        = 0x00030000,
    HitCountMask     = 0x0F800000,
    HeadTrailIdMask  = 0x00100000,
    EdgeIdMask       = 0x00008000,
    TriggerTimeMask  = 0x000FFFFF,
    TriggerTagMask   = 0x0FFFFFFF,
+   TrTagShortMask   = 0x00000003,
    AmplitudeIdMask  = 0x0000F000,
    AmplitudeMask    = 0x00000FFF,
    HumidityMask     = 0x000000FF,
@@ -98,7 +102,8 @@ class MDdataWordBM : public MDdataWord {
    SpillTimeShift    = 0,
    ChannelIdShift    = 21,
    HitTimeShift      = 0,
-   HitIdShift        = 16,
+   HitIdShift        = 18,
+   TagIdShift        = 16,
    HitCountShift     = 23,
    HeadTrailIdShift  = 20,
    EdgeIdShift       = 15,

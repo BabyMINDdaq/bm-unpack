@@ -25,35 +25,53 @@ void MDfragmentBM::SetDataPtr( void *d, uint32_t aSize ) {
   this->Init();
 }
 
-void MDfragmentBM::Init() {
-//     cout << " Calling MDfragmentBM::Init() " << endl;
+void MDfragmentBM::Clean() {
   this->UnValidate();
 
+  int nTr = _trigEvents.size();
+  for (int i=0; i<nTr; ++i) {
+    delete _trigEvents[i];
+  }
   _trigEvents.resize(0);
+}
+
+void MDfragmentBM::Init() {
+//     cout << " Calling MDfragmentBM::Init() " << endl;
+  this->Clean();
+  _size = 4;
 
   unsigned int * ptr = this->Get32bWordPtr(0);
   MDdataWordBM dw(ptr);
   if ( dw.IsValid() ) {
     // Check the reliability of the header and decode the header information.
-    if (dw.GetDataType() != MDdataWordBM::SpillHeader ){ // The data doesn't start with a header
-      cout << dw << endl;
+    if (dw.GetDataType() != MDdataWordBM::SpillHeader ) { // The data doesn't start with a header
       throw MDexception("ERROR in MDfragmentBM::Init() : 1st word is not a spill header.");
     } else {
       _spillTag = dw.GetSpillTag();
       _boardId = dw.GetBoardId();
       bool done(false);
-      int nDW(1);
-
+      ++ptr;
       while (!done) {
-        dw.SetDataPtr(++ptr);
-        ++nDW;
-
+        dw.SetDataPtr(ptr);
         if (dw.GetDataType() == MDdataWordBM::TrigHeader) {
-          _trigEvents.push_back(nDW-1);
-        }
-
-        if (dw.GetDataType() == MDdataWordBM::SpillTrailer1)
+          MDpartEventBM *xPe = new MDpartEventBM(ptr);
+          xPe->SetTriggerEvents(&_trigEvents);
+          xPe->Init();
+          unsigned int pe_size = xPe->GetSize();
+          _size += pe_size;
+          ptr += pe_size/4;
+          if (xPe->getNumDataWords() > 3) {
+            _trigEvents.push_back( xPe );
+          } else {
+            delete xPe;
+          }
+        } else if (dw.GetDataType() == MDdataWordBM::SpillTrailer1) {
           done = true;
+          _size += 4;
+        } else {
+          cout << dw << endl;
+          throw MDexception("ERROR in MDfragmentBM::Init() : Wrong data type.");
+        }
       }
 
       if ( dw.GetHeadTrailId() ||
@@ -67,7 +85,7 @@ void MDfragmentBM::Init() {
       }
 
       dw.SetDataPtr(++ptr);
-      ++nDW;
+      _size += 4;
 
       if ( dw.GetDataType() != MDdataWordBM::SpillTrailer1 ||
            dw.GetHeadTrailId()   !=  1 ||
@@ -78,17 +96,17 @@ void MDfragmentBM::Init() {
       _humidity = dw.GetHumidity();
 
       dw.SetDataPtr(++ptr);
-      ++nDW;
-
+      _size += 4;
+      cout << "Spill tag: " << _spillTag << "  Board Id: " << _boardId
+           <<"  N triggers: " << _trigEvents.size() << endl;
       if ( dw.GetDataType() != MDdataWordBM::SpillTrailer2 )
         throw MDexception("ERROR in MDfragmentBM::Init() : The spill trailer 2 is not consistent.");
 
-      _size = nDW*4;
     }
   }
 }
 
-uint32_t* MDfragmentBM::GetTriggerEventPtr(unsigned int evId) {
+MDpartEventBM* MDfragmentBM::GetTriggerEventPtr(unsigned int evId) {
   if ( evId >= _trigEvents.size() ) {
     stringstream ss;
     ss << "ERROR in MDfragmentBM::GetTriggerEventPtr() : ";
@@ -96,8 +114,7 @@ uint32_t* MDfragmentBM::GetTriggerEventPtr(unsigned int evId) {
     throw MDexception( ss.str() );
   }
 
-  uint32_t *ptr = this->Get32bWordPtr( _trigEvents[evId] );
-  return ptr;
+  return _trigEvents[evId];
 }
 
 void MDfragmentBM::Dump() {

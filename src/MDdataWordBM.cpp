@@ -64,6 +64,11 @@ uint32_t MDdataWordBM::GetHitId() {
   return 0;
 }
 
+uint32_t MDdataWordBM::GetTagId() {
+  if (IsValid())  return ( (*(uint32_t*)(_data) & TagIdMask ) >> TagIdShift );
+  return 0;
+}
+
 uint32_t MDdataWordBM::GetHitCount() {
   if (IsValid())  return ( (*(uint32_t*)(_data) & HitCountMask ) >> HitCountShift );
   return 0;
@@ -81,6 +86,11 @@ uint32_t MDdataWordBM::GetTriggerTime() {
 
 uint32_t MDdataWordBM::GetTriggerTag() {
   if (IsValid())  return ( (*(uint32_t*)(_data) & TriggerTagMask ) >> TriggerTagShift );
+  return 0;
+}
+
+uint32_t MDdataWordBM::GetTriggerTagShort() {
+  if (IsValid())  return ( (*(uint32_t*)(_data) & TrTagShortMask ) >> TriggerTagShift );
   return 0;
 }
 
@@ -119,12 +129,14 @@ ostream & operator<<(ostream &s, MDdataWordBM &dw) {
     break;
 
   case MDdataWordBM::TrigHeader:
-    s << "Trigger Header  Gl. Trigger Tag: " << dw.GetTriggerTag();
+    s << "Trigger Header  Gl. Trigger Tag: " << dw.GetTriggerTag()
+      << " (" << dw.GetTriggerTagShort() << ")";
     break;
 
   case MDdataWordBM::TimeMeas:
     s << "Channel: " << dw.GetChannelId()
-      << "  HitId: " << dw.GetHitId();
+      << "  HitId: " << dw.GetHitId()
+      << "  TagId: " << dw.GetTagId();
     if ( dw.GetEdgeId()==0 ) s << "  Time (0, RE): ";
     else s << "  Time (1, FE): ";
 
@@ -134,6 +146,7 @@ ostream & operator<<(ostream &s, MDdataWordBM &dw) {
   case MDdataWordBM::ChargeMeas:
     s << "Channel: " << dw.GetChannelId()
       << "  HitId: " << dw.GetHitId()
+      << "  TagId: " << dw.GetTagId()
       << "  Amplitude Id: " << dw.GetAmplitudeId()
       << "  Charge: " << dw.GetAmplitude();
     break;

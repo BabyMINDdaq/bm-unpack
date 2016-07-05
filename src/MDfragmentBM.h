@@ -18,24 +18,25 @@
 #ifndef __MDFRAGMENT_BM_H
 #define __MDFRAGMENT_BM_H
 
-#include "MDdataContainer.h"
-
 #include <stdlib.h>
 #include <vector>
 #include <stdio.h>
 #include <iostream>
 
+#include "MDdataContainer.h"
+#include "MDpartEventBM.h"
 
 class MDfragmentBM : public MDdataContainer {
 
  public:
 
   MDfragmentBM( void *d = 0 ) : MDdataContainer(d) {}
-  virtual ~MDfragmentBM() {}
+  virtual ~MDfragmentBM() { this->Clean(); }
 
   void SetDataPtr( void *d, uint32_t aSize=0 );
   void Dump();
   void Init();
+  void Clean();
 
   unsigned int GetBoardId()     {return _boardId;}
   unsigned int GetSpillTag()    {return _spillTag;}
@@ -43,7 +44,7 @@ class MDfragmentBM : public MDdataContainer {
   unsigned int GetTemperature() {return _temperature;}
 
   unsigned int GetNumOfTriggers() {return _trigEvents.size();}
-  uint32_t*    GetTriggerEventPtr(unsigned int evId);
+  MDpartEventBM*    GetTriggerEventPtr(unsigned int evId);
 
  private:
   unsigned int _boardId;
@@ -51,9 +52,9 @@ class MDfragmentBM : public MDdataContainer {
   unsigned int _humidity;
   unsigned int _temperature;
 
-  std::vector <unsigned int> _trigEvents;
+  std::vector <MDpartEventBM*> _trigEvents;
 };
 
-ostream &operator<<(std::ostream &s,MDfragmentBM &df);
+// ostream &operator<<(std::ostream &s, MDfragmentBM &df);
 
 #endif

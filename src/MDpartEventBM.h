@@ -18,12 +18,14 @@
 #ifndef __MDPARTEVENT_BM_H
 #define __MDPARTEVENT_BM_H
 
-#include "MDdataContainer.h"
 
 #include <stdlib.h>
 #include <vector>
 #include <stdio.h>
 #include <iostream>
+
+#include "MDdataContainer.h"
+#include "MDdataWordBM.h"
 
 #define BM_FEB_NCHANNELS 96
 
@@ -31,45 +33,69 @@ class MDpartEventBM : public MDdataContainer {
 
  public:
 
-  MDpartEventBM( void *d = 0 );
-  virtual ~MDpartEventBM(){}
+  MDpartEventBM(void *d = 0);
+  virtual ~MDpartEventBM() {}
 
 
-  void SetDataPtr( void *d, uint32_t aSize=0 );
-//   void Dump();
+  void SetDataPtr(void *d, uint32_t aSize=0);
+  void Dump();
   void Init();
 
-  unsigned int GetTriggerTime() {return _triggerTime;}
-  unsigned int GetHitCount()    {return _hitCount;}
-  unsigned int GetNLeadingEdgeHits(unsigned int ich)  {return _nLeadingEdgeHits[ich];}
-  unsigned int GetNTrailingEdgeHits(unsigned int ich) {return _nTrailingEdgeHits[ich];}
-  unsigned int GetHitTime(unsigned int ih, unsigned int ich, char t);
-  unsigned int GetLeadingTime(unsigned int ih, unsigned int ich)  { return GetHitTime(ih, ich, 'l');}
-  unsigned int GetTrailingTime(unsigned int ih, unsigned int ich) { return GetHitTime(ih, ich, 't');}
-  unsigned int GetHitAmplitude(unsigned int ich, char t);
-  unsigned int GetTriggerTag() {return _triggerTag;}
+  void AddTimeHit(MDdataWordBM &dw);
+  void AddAmplitudeHit(MDdataWordBM &dw);
 
-  std::vector<unsigned int> GetLeadingTimes(unsigned int ih)   {return _leadingEdgeHit[ih];}
-  std::vector<unsigned int> GetTrailingTimes(unsigned int ih)  {return _trailingEdgeHit[ih];}
+  unsigned int GetTriggerTime() { return _triggerTime; }
+  unsigned int GetHitCount()    { return _hitCount; }
+  unsigned int GetNLeadingEdgeHits(unsigned int ich)  { return _nLeadingEdgeHits[ich]; }
+  unsigned int GetNTrailingEdgeHits(unsigned int ich) { return _nTrailingEdgeHits[ich]; }
+  unsigned int GetHitTime(unsigned int ih, unsigned int ich, char t);
+  unsigned int GetHitTimeId(unsigned int ih, unsigned int ich, char t);
+
+  unsigned int GetLeadingTime(unsigned int ih, unsigned int ich)    { return GetHitTime(ih, ich, 'l'); }
+  unsigned int GetTrailingTime(unsigned int ih, unsigned int ich)   { return GetHitTime(ih, ich, 't'); }
+  unsigned int GetLeadingTimeId(unsigned int ih, unsigned int ich)  { return GetHitTimeId(ih, ich, 'l'); }
+  unsigned int GetTrailingTimeId(unsigned int ih, unsigned int ich) { return GetHitTimeId(ih, ich, 't'); }
+
+  unsigned int GetHitAmplitude(unsigned int ich, char t);
+  unsigned int GetHitAmplitudeId(unsigned int ich, char t);
+
+  unsigned int GetTriggerTag()   {return _triggerTag;}
+  unsigned int GetTriggerTagId() {return _triggerTagId;}
+
+  std::vector<unsigned int> GetLeadingTimes(unsigned int ich)   { return _leadingEdgeHitTime[ich]; }
+  std::vector<unsigned int> GetTrailingTimes(unsigned int ich)  { return _trailingEdgeHitTime[ich]; }
 
   unsigned int getNumDataWords() {return _nDataWords;}
+
+  void SetTriggerEvents(std::vector <MDpartEventBM*> *te) {_trigEvents = te;}
 
  private:
   unsigned int _triggerTime;
   unsigned int _hitCount;
   unsigned int _triggerTag;
+  unsigned int _triggerTagId;
 
-  unsigned int          _nLeadingEdgeHits[BM_FEB_NCHANNELS];  /** Number leading edge hits per channel. */
-  unsigned int          _nTrailingEdgeHits[BM_FEB_NCHANNELS]; /** Number trailing edge hits per channell.*/
+  bool _lgHit[BM_FEB_NCHANNELS];
+  bool _hgHit[BM_FEB_NCHANNELS];
 
-  unsigned int          _amplitudeHits[BM_FEB_NCHANNELS][2];
+  unsigned int _lgHitAmplitude[BM_FEB_NCHANNELS];
+  unsigned int _hgHitAmplitude[BM_FEB_NCHANNELS];
+  unsigned int _lgHitAmplitudeId[BM_FEB_NCHANNELS];
+  unsigned int _hgHitAmplitudeId[BM_FEB_NCHANNELS];
 
-  std::vector<unsigned int>  _leadingEdgeHit[BM_FEB_NCHANNELS];      /// A vector of leading edge hits per channel
-  std::vector<unsigned int>  _trailingEdgeHit[BM_FEB_NCHANNELS];     /// A vector of trailing edge hits per channel
+  unsigned int _nLeadingEdgeHits[BM_FEB_NCHANNELS];  /** Number of leading edge hits per channel. */
+  unsigned int _nTrailingEdgeHits[BM_FEB_NCHANNELS]; /** Number of trailing edge hits per channell.*/
+
+  std::vector<unsigned int>  _leadingEdgeHitTime[BM_FEB_NCHANNELS];      /// A vector of leading edge hit timess per channel
+  std::vector<unsigned int>  _trailingEdgeHitTime[BM_FEB_NCHANNELS];     /// A vector of trailing edge hit times per channel
+  std::vector<unsigned int>  _leadingEdgeHitId[BM_FEB_NCHANNELS];        /// A vector of leading edge hit ids per channel
+  std::vector<unsigned int>  _trailingEdgeHitId[BM_FEB_NCHANNELS];       /// A vector of trailing edge hit ids per channel
 
   unsigned int _nDataWords;
-};
 
-// ostream &operator<<(std::ostream &s,MDpartEventBM &df);
+  std::vector <MDpartEventBM*> *_trigEvents;
+
+  friend ostream &operator<<(std::ostream &s, MDpartEventBM &df);
+};
 
 #endif
