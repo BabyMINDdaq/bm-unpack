@@ -39,6 +39,7 @@ int main( int argc, char **argv ) {
   argh.AddArgument("help","print this message","h");
   argh.AddArgument("directory","Path for a data file","d","<string>","." );
   argh.AddArgument("file","Name of a data file","f","<string>","mandatory");
+  argh.AddArgument("begin","Initial position in input file","b","<int>","0");
   argh.AddArgument("nwords","Number of data words to be processed","n","<int>","0");
 
   // Check the user arguments consistancy
@@ -55,6 +56,8 @@ int main( int argc, char **argv ) {
   if ( argh.GetValue("file", stringBuf) != MDARGUMENT_STATUS_OK ) return -1;
   string filename = stringBuf;
 
+  if ( argh.GetValue("begin", intBuf) != MDARGUMENT_STATUS_OK ) return -1;
+  int pos = intBuf*4;
 
   if ( argh.GetValue("nwords", intBuf) != MDARGUMENT_STATUS_OK ) return -1;
   int nWords = intBuf;
@@ -66,6 +69,7 @@ int main( int argc, char **argv ) {
   }
 
   long32* dataPtr = new long32;
+  ifs.seekg(pos);
 
   int dwCount(0);
   while (!ifs.eof()) {
