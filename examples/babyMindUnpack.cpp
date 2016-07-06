@@ -60,8 +60,12 @@ int main( int argc, char **argv ) {
   filename = stringBuf;
 
   TFile rfile("histos.root", "recreate");
-  TH1I  h1("h1_hit_ch", "hit channels", 100, 0, 100);
-  TH1I  h2("h2_ampl", "hit ampl.", 200, 0, 5000);
+  TH1I  h_lgah("h_lg_amp_hit_ch", "hit channels", 100, 0, 100);
+  TH1I  h_hgah("h_lh_amp_hit_ch", "hit channels", 100, 0, 100);
+  TH1I  h_lth("h_le_time_hit_ch", "hit channels", 100, 0, 100);
+  TH1I  h_tth("h_te_time_hit_ch", "hit channels", 100, 0, 100);
+  TH1I  h_lga("h_lg_ampl", "hit ampl.", 200, 0, 5000);
+  TH1I  h_hga("h_hg_ampl", "hit ampl.", 200, 0, 5000);
 
   MDdateFile dfile(filename, filepath);
 // Open the file and loop over events.
@@ -84,10 +88,23 @@ int main( int argc, char **argv ) {
           for (int ich=0; ich<BM_FEB_NCHANNELS; ++ich) {
             int nHits = event->GetNLeadingEdgeHits(ich);
             if (nHits)
-              h1.Fill(ich, nHits);
+              h_lth.Fill(ich, nHits);
 
-            int q = event->GetHitAmplitude(ich, 'h');
-            h2.Fill(q);
+            nHits = event->GetNTrailingEdgeHits(ich);
+            if (nHits)
+              h_tth.Fill(ich, nHits);
+
+            if (event->LGAmplitudeHitExists(ich)) {
+              int q = event->GetHitAmplitude(ich, 'l');
+              h_lga.Fill(q);
+              h_lgah.Fill(ich);
+            }
+
+            if (event->HGAmplitudeHitExists(ich)) {
+              int q = event->GetHitAmplitude(ich, 'h');
+              h_hga.Fill(q);
+              h_hgah.Fill(ich);
+            }
           }
         }
       } catch (MDexception & lExc)  {
@@ -110,8 +127,13 @@ int main( int argc, char **argv ) {
 
   dfile.close();
 
-  h1.Write();
-  h2.Write();
+  h_lgah.Write();
+  h_hgah.Write();
+  h_lth.Write();
+  h_tth.Write();
+  h_lga.Write();
+  h_hga.Write();
+
   rfile.Close();
   dfile.close();
   delete dataBuff;

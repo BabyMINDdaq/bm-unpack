@@ -98,7 +98,7 @@ void MDfragmentBM::Init() {
       dw.SetDataPtr(++ptr);
       _size += 4;
       cout << "Spill tag: " << _spillTag << "  Board Id: " << _boardId
-           <<"  N triggers: " << _trigEvents.size() << endl;
+           <<"  N triggers: " << _trigEvents.size() << "\n\n";
       if ( dw.GetDataType() != MDdataWordBM::SpillTrailer2 )
         throw MDexception("ERROR in MDfragmentBM::Init() : The spill trailer 2 is not consistent.");
 

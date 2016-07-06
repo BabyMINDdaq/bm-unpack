@@ -99,7 +99,8 @@ char* MDdateFile::GetNextEvent() {
 
   uint32_t spillSize = _spill_size[_lastSpill];
   uint32_t spillPos  = _spill_pos[_lastSpill];
-//   cout << "GetNextEvent  pos: " << spillPos << "  size: " << spillSize << endl;
+  cout << "GetNextEvent  pos: " << spillPos/4 << "  size: " << spillSize/4 
+       << " in DW units (4 bytes)" << endl;
   return GetSpill(spillPos, spillSize);
 }
 

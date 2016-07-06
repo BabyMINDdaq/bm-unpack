@@ -58,6 +58,9 @@ class MDpartEventBM : public MDdataContainer {
 
   unsigned int GetHitAmplitude(unsigned int ich, char t);
   unsigned int GetHitAmplitudeId(unsigned int ich, char t);
+  bool         LGAmplitudeHitExists(unsigned int ich) {return _lgHit[ich];}
+  bool         HGAmplitudeHitExists(unsigned int ich) {return _hgHit[ich];}
+
 
   unsigned int GetTriggerTag()   {return _triggerTag;}
   unsigned int GetTriggerTagId() {return _triggerTagId;}
