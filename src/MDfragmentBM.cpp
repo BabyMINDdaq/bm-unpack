@@ -60,11 +60,11 @@ void MDfragmentBM::Init() {
           unsigned int pe_size = xPe->GetSize();
           _size += pe_size;
           ptr += pe_size/4;
-          if (xPe->getNumDataWords() > 3) {
+          //if (xPe->getNumDataWords() > 3) {
             _trigEvents.push_back( xPe );
-          } else {
-            delete xPe;
-          }
+          //} else {
+            //delete xPe;
+          //}
         } else if (dw.GetDataType() == MDdataWordBM::SpillTrailer1) {
           done = true;
           _size += 4;
