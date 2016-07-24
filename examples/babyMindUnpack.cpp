@@ -77,11 +77,14 @@ int main( int argc, char **argv ) {
     do { // Loop over all spills
       eventBuffer =  dfile.GetNextEvent();
       try {
+        if(eventBuffer == NULL) cout<<"WHAT"<<endl;
+
         MDfragmentBM   spill;
         spill.SetDataPtr(eventBuffer);
-
+        cout<<"spilltag="<<spill.GetSpillTag()<<endl;
         MDpartEventBM *event;
         int nTr = spill.GetNumOfTriggers();
+        cout<<"nTr="<<nTr<<endl;
         for (int i=0; i<nTr; ++i) {
           event = spill.GetTriggerEventPtr(i);
 //           event->Dump();
