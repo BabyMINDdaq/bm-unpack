@@ -63,6 +63,8 @@ class MDdateFile {
 
   void reset();
 
+  int NSpills(){return _spill_size.size();}
+
  private:
   std::vector<uint32_t> _spill_pos;
   std::vector<uint32_t> _spill_size;
