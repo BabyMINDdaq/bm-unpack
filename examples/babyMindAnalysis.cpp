@@ -98,6 +98,9 @@ int main( int argc, char **argv ) {
 
   TTree* t3 = new TTree("t3","Per trigger tree");
 
+  long int nGoodHits=0;
+  long int hitCand=0;
+
    vector<int> nHitsChannel;
    for(int i = 0; i<96; i++)
    {
@@ -239,12 +242,15 @@ t2->Branch("tester",&tester);
     do { // Loop over all spills
       eventBuffer =  dfile.GetNextEvent();
 
+
+      cout<<"dfile.NSpills()="<<dfile.NSpills()<<endl;
       if(eventBuffer== NULL) break;
 
 
       try {
         MDfragmentBM   spill;
         spill.SetDataPtr(eventBuffer);
+
         //cout<<"spilltag="<<spill.GetSpillTag()<<endl;
         MDpartEventBM *event;
         int nTr = spill.GetNumOfTriggers();
@@ -274,7 +280,6 @@ t2->Branch("tester",&tester);
           triggerVec.push_back(i);
 
           gTagTrigger=i;
-
           int coincidentHits =0;
           int maxTime =0;
           int minTime =4000;
@@ -410,6 +415,9 @@ t2->Branch("tester",&tester);
 
           for (int ich=0; ich<BM_FEB_NCHANNELS; ++ich) {
             int nHits = event->GetNLeadingEdgeHits(ich);
+            //hitCand+=event->GetNLeadingEdgeHits(ich);
+            //hitCand+=event->GetNTrailingEdgeHits(ich);
+
             totHitsChannels+=nHits;
             if (nHits)
             {
@@ -419,11 +427,50 @@ t2->Branch("tester",&tester);
             }
                 nHitsChannel[ich]+=nHits;
                 nHitsChannelInt+=nHits;
-                
+                /*
+                if(event->GetNLeadingEdgeHits(ich) <= event->GetNTrailingEdgeHits(ich))
+                {
+                  int numHits = event->GetNLeadingEdgeHits(ich);
+                  for(int ih=0; ih<numHits; ih++)
+                  {
+                    if(event->GetHitTime(ih,ich, 'l')>0 && event->GetHitTime(ih,ich, 't')>0
+                    && event->GetHitAmplitude(ich, 'h')>0 && event->GetHitAmplitude(ich, 'l')>0) nGoodHits++;
+                  }
+                }
+                if(event->GetNLeadingEdgeHits(ich) >= event->GetNTrailingEdgeHits(ich))
+                {
+                  int numHits = event->GetNTrailingEdgeHits(ich);
+                  for(int ih=0; ih<numHits; ih++)
+                  {
+                    if(event->GetHitTime(ih,ich, 'l')>0 && event->GetHitTime(ih,ich, 't')>0
+                    && event->GetHitAmplitude(ich, 'h')>0 && event->GetHitAmplitude(ich, 'l')>0) nGoodHits++;
+                  }
+                }
+                */
+
+                if((event->GetNLeadingEdgeHits(ich) && event->GetNTrailingEdgeHits(ich)))
+                {
+                  //hitCand++;
+                  hitCand+=event->GetNLeadingEdgeHits(ich) + event->GetNTrailingEdgeHits(ich);
+                  if(event->GetHitAmplitude(ich, 'l')>0 && event->GetHitAmplitude(ich, 'h')>0)
+                  {
+                    for(int ih=0; ih<event->GetNLeadingEdgeHits(ich); ih++)
+                    {
+                      nGoodHits++;
+                    }
+                    for(int ih=0; ih<event->GetNTrailingEdgeHits(ich); ih++)
+                    {
+                      nGoodHits++;
+                    }
+                  }
+
+                }
+
                 
               double good_hits=0;
               for(int ih=0; ih<nHits; ih++)
               {
+
                 h4.Fill(event->GetHitTime(ih,ich, 'l')); 
                 hitTime.push_back(event->GetHitTime(ih,ich, 'l'));
                 hitsTime.push_back(event->GetHitTime(ih,ich, 'l'));
@@ -641,6 +688,11 @@ t2->Branch("tester",&tester);
 
   rfile.Close();
   dfile.close();
+
+  cout<<"FigureOfMerit="<<(double)nGoodHits / (double)hitCand<<endl;
+  //cout<<nGoodHits<<endl;
+  //cout<<hitCand<<endl;
+  
   delete dataBuff;
   return 0;
 }
