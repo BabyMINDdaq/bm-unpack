@@ -10,7 +10,6 @@
   ./dump -f 1.daq
 
 or
-
   ./unpack -f 1.daq
 
 use "--help" to see the other options.

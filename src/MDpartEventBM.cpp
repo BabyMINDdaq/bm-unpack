@@ -1,17 +1,19 @@
-/* This file is part of BabyMINDupack
+/* This file is part of BabyMINDdaq software package. This software
+ * package is designed for internal use for the Baby MIND detector
+ * collaboration and is tailored for this use primarily.
  *
- * BabyMINDupack is free software: you can redistribute it and/or modify
+ * BabyMINDdaq is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * BabyMINDupack is distributed in the hope that it will be useful,
+ * BabyMINDdaq is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with BabyMINDupack.  If not, see <http://www.gnu.org/licenses/>.
+ * along with BabyMINDdaq.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
 
@@ -113,7 +115,7 @@ void MDpartEventBM::Init() {
             stringstream ss;
             ss << "ERROR in MDpartEventBM::Init() : Unexpected data word (id: "
                << dw.GetDataType() << ")";
-//             cout << ss.str() << endl;
+            cout << dw << endl;
             throw MDexception(ss.str());
             break;
         }
