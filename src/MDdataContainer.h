@@ -79,7 +79,7 @@ class MDdataContainer {
   void UnValidate() { _valid = false;}
   void SetSize(unsigned int s) {_size = s;}
 
-  virtual void Dump(int atTheTime=1){
+  virtual void Dump(){
     if (_size%4) {
       cerr << " Not 32 bits data !! Trying to ignore \n" ;
       return;
