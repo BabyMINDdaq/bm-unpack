@@ -17,42 +17,15 @@
  *
  */
 
-#ifndef __MDDATAWORD_H
-#define __MDDATAWORD_H
+#include <iostream>
 
-#include <stdint.h>
-
-#include "MDdataContainer.h"
+#include "MDevent.h"
 
 using namespace std;
+void MDevent::SetDataPtr(void *d, size_t s) {
+  MDdataContainer::SetDataPtr(d);
+  this->_size = this->HeaderPtr()->size_;
 
-class MDdataWord : public MDdataContainer {
- public:
-  MDdataWord(void *d=0) : MDdataContainer(d, 4) { if (_data) _valid = true;}
+}
 
-  MDdataWord(MDdataWord& dw) {
-    _data  = dw.GetDataPtr();
-    _size  = dw.GetSize();
-    _valid = dw.IsValid();
-  }
 
-  MDdataWord(const MDdataWord& dw) {}
-
-  virtual ~MDdataWord(){}
-
-  virtual void SetDataPtr(void *d, uint32_t aSize=4) {
-    MDdataContainer::SetDataPtr(d);
-    if ( _data ) {
-      _size = aSize;
-      _valid = true;
-    }
-  }
-
-  virtual void Dump() {
-    if (_valid)
-      MDdataContainer::Dump();
-    else cout << "  Data Word NOT valid " << endl;
-  }
-};
-
-#endif

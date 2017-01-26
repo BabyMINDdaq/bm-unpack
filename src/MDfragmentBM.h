@@ -20,23 +20,30 @@
 #ifndef __MDFRAGMENT_BM_H
 #define __MDFRAGMENT_BM_H
 
-#include <stdlib.h>
 #include <vector>
-#include <stdio.h>
-#include <iostream>
 
 #include "MDdataContainer.h"
 #include "MDpartEventBM.h"
+#include "BMDDataHeaders.h"
 
 class MDfragmentBM : public MDdataContainer {
+public:
+  MDfragmentBM() : MDdataContainer() {}
+  MDfragmentBM(void *d, size_t s=1) : MDdataContainer(d, s) {}
 
- public:
-
-  MDfragmentBM( void *d = 0 ) : MDdataContainer(d) {}
   virtual ~MDfragmentBM() { this->Clean(); }
 
-  void SetDataPtr( void *d, uint32_t aSize=0 );
-  void Dump();
+  void SetDataPtr(void *d, size_t s=0) override;
+
+  BMDDataFragmenHeader* HeaderPtr() {
+    return reinterpret_cast<BMDDataFragmenHeader*>(_data);
+  }
+
+  uint8_t* PayLoadPtr() {
+    return _data + sizeof(BMDDataFragmenHeader);
+  }
+
+  void Dump() override;
   void Init();
   void Clean();
 
@@ -45,8 +52,8 @@ class MDfragmentBM : public MDdataContainer {
   unsigned int GetHumidity()    {return _humidity;}
   unsigned int GetTemperature() {return _temperature;}
 
-  unsigned int GetNumOfTriggers() {return _trigEvents.size();}
-  MDpartEventBM*    GetTriggerEventPtr(unsigned int evId);
+  unsigned int   GetNumOfTriggers() {return _trigEvents.size();}
+  MDpartEventBM* GetTriggerEventPtr(unsigned int evId);
 
  private:
   unsigned int _boardId;

@@ -22,98 +22,79 @@
 using namespace std;
 
 uint32_t MDdataWordBM::GetDataType() {
-  if (IsValid())  return ( (*(uint32_t*)(_data) & DataTypeMask ) >> DataTypeShift );
-  return 0;
+  return ( (*(uint32_t*)(_data) & DataTypeMask ) >> DataTypeShift );
 }
 
 uint32_t MDdataWordBM::GetSid() {
-  if (IsValid())  return ( (*(uint32_t*)(_data) & SidMask ) >> SidShift );
-  return 0;
+  return ( (*(uint32_t*)(_data) & SidMask ) >> SidShift );
 }
 
 uint32_t MDdataWordBM::GetHeadTrailId() {
-  if (IsValid())  return ( (*(uint32_t*)(_data) & HeadTrailIdMask ) >> HeadTrailIdShift );
-  return 0;
+  return ( (*(uint32_t*)(_data) & HeadTrailIdMask ) >> HeadTrailIdShift );
 }
 
 uint32_t MDdataWordBM::GetBoardId() {
-  if (IsValid())  return ( (*(uint32_t*)(_data) & BoardIdMask ) >> BoardIdShift );
-  return 0;
+  return ( (*(uint32_t*)(_data) & BoardIdMask ) >> BoardIdShift );
 }
 
 uint32_t MDdataWordBM::GetSpillTag() {
-  if (IsValid())  return ( (*(uint32_t*)(_data) & SpillTagMask ) >> SpillTagShift );
-  return 0;
+  return ( (*(uint32_t*)(_data) & SpillTagMask ) >> SpillTagShift );
 }
 
 uint32_t MDdataWordBM::GetSpillTime() {
-  if (IsValid())  return ( (*(uint32_t*)(_data) & SpillTimeMask ) >> SpillTimeShift );
-  return 0;
+  return ( (*(uint32_t*)(_data) & SpillTimeMask ) >> SpillTimeShift );
 }
 
 uint32_t MDdataWordBM::GetChannelId() {
-  if (IsValid())  return ( (*(uint32_t*)(_data) & ChannelIdMask ) >> ChannelIdShift );
-  return 0;
+  return ( (*(uint32_t*)(_data) & ChannelIdMask ) >> ChannelIdShift );
 }
 
 uint32_t MDdataWordBM::GetHitTime() {
-  if (IsValid())  return ( (*(uint32_t*)(_data) & HitTimeMask ) >> HitTimeShift );
-  return 0;
+  return ( (*(uint32_t*)(_data) & HitTimeMask ) >> HitTimeShift );
 }
 
 uint32_t MDdataWordBM::GetHitId() {
-  if (IsValid())  return ( (*(uint32_t*)(_data) & HitIdMask ) >> HitIdShift );
-  return 0;
+  return ( (*(uint32_t*)(_data) & HitIdMask ) >> HitIdShift );
 }
 
 uint32_t MDdataWordBM::GetTagId() {
-  if (IsValid())  return ( (*(uint32_t*)(_data) & TagIdMask ) >> TagIdShift );
-  return 0;
+  return ( (*(uint32_t*)(_data) & TagIdMask ) >> TagIdShift );
 }
 
 uint32_t MDdataWordBM::GetHitCount() {
-  if (IsValid())  return ( (*(uint32_t*)(_data) & HitCountMask ) >> HitCountShift );
-  return 0;
+  return ( (*(uint32_t*)(_data) & HitCountMask ) >> HitCountShift );
 }
 
 uint32_t MDdataWordBM::GetEdgeId() {
-  if (IsValid())  return ( (*(uint32_t*)(_data) & EdgeIdMask ) >> EdgeIdShift );
-  return 0;
+  return ( (*(uint32_t*)(_data) & EdgeIdMask ) >> EdgeIdShift );
 }
 
 uint32_t MDdataWordBM::GetTriggerTime() {
-  if (IsValid())  return ( (*(uint32_t*)(_data) & TriggerTimeMask ) >> TriggerTimeShift );
-  return 0;
+  return ( (*(uint32_t*)(_data) & TriggerTimeMask ) >> TriggerTimeShift );
 }
 
 uint32_t MDdataWordBM::GetTriggerTag() {
-  if (IsValid())  return ( (*(uint32_t*)(_data) & TriggerTagMask ) >> TriggerTagShift );
-  return 0;
+  return ( (*(uint32_t*)(_data) & TriggerTagMask ) >> TriggerTagShift );
 }
 
 uint32_t MDdataWordBM::GetTriggerTagShort() {
-  if (IsValid())  return ( (*(uint32_t*)(_data) & TrTagShortMask ) >> TriggerTagShift );
-  return 0;
+  return ( (*(uint32_t*)(_data) & TrTagShortMask ) >> TriggerTagShift );
 }
 
 uint32_t MDdataWordBM::GetAmplitudeId() {
-  if (IsValid())  return ( (*(uint32_t*)(_data) & AmplitudeIdMask ) >> AmplitudeIdShift );
-  return 0;
+  return ( (*(uint32_t*)(_data) & AmplitudeIdMask ) >> AmplitudeIdShift );
 }
 
 uint32_t MDdataWordBM::GetAmplitude() {
-  if (IsValid())  return ( (*(uint32_t*)(_data) & AmplitudeMask ) >> AmplitudeShift );
-  return 0;
+  return ( (*(uint32_t*)(_data) & AmplitudeMask ) >> AmplitudeShift );
 }
 
 uint32_t MDdataWordBM::GetHumidity() {
-  if (IsValid())  return ( (*(uint32_t*)(_data) & HumidityMask ) >> HumidityShift );
-  return 0;
+  return ( (*(uint32_t*)(_data) & HumidityMask ) >> HumidityShift );
 }
 
 uint32_t MDdataWordBM::GetTemperature() {
-  if (IsValid())  return ( (*(uint32_t*)(_data) & TemperatureMask ) >> TemperatureShift );
-  return 0;
+  return ( (*(uint32_t*)(_data) & TemperatureMask ) >> TemperatureShift );
 }
 
 void MDdataWordBM::Dump() {
@@ -173,7 +154,7 @@ ostream & operator<<(ostream &s, MDdataWordBM &dw) {
     break;
 
   case MDdataWordBM::SpillTrailer2:
-    s << "Spill Trailer (2) Spill time: " << dw.GetSpillTime();
+    s << "Spill Trailer (2)  Spill time: " << dw.GetSpillTime();
     break;
 
   default:

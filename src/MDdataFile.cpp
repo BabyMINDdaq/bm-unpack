@@ -15,19 +15,24 @@
  *
  */
 
+#include <iostream>
+
 #include "MDdataFile.h"
 #include "MDdataWordBM.h"
 #include "MDexception.h"
 
 using namespace std;
+MDdateFile::MDdateFile()
+:_eventBuffer(nullptr),_filePath("."), _fileName("0.000"),
+ _curPos(0),_fileSize(0), _eventSize(0), _nBytesRead(0) {}
 
 MDdateFile::MDdateFile(string fn, string fp)
-:_eventBuffer(NULL),_filePath(fp), _fileName(fn),_curPos(0)
-,_fileSize(0),_nBytesRead(0), _lastSpill(-1) {}
+:_eventBuffer(nullptr),_filePath(fp), _fileName(fn),
+ _curPos(0),_fileSize(0), _eventSize(0), _nBytesRead(0) {}
 
 MDdateFile::~MDdateFile() {
   if (_eventBuffer)
-    free(_eventBuffer);
+    delete _eventBuffer;
 }
 
 bool MDdateFile::open() {
@@ -54,74 +59,50 @@ bool MDdateFile::open() {
 }
 
 void MDdateFile::close() {
-//   if (_eventBuffer)
-//     delete _eventBuffer;
-
-  _eventBuffer = 0;
-  _ifs.close();
-}
-
-
-void MDdateFile::init() {
-  this->reset();
-  _curPos = _ifs.tellg();
   if (_eventBuffer)
     delete _eventBuffer;
 
-  _eventBuffer = new char[4];
-
-  while (!_ifs.eof()) {
-//     _ifs.read( _eventBuffer, sizeof( _eventBuffer ) );
-    _ifs.read( _eventBuffer, 4 );
-    MDdataWordBM dw(_eventBuffer);
-//     cout << dw << endl;
-    if (dw.GetDataType() == MDdataWordBM::SpillHeader) {
-      _curPos = _ifs.tellg();
-//        cout << dw << endl;
-//        cout << "pos: " << _curPos << endl;
-      if (_spill_pos.size()) {
-//         uint32_t size = _curPos - _spill_pos.back() - 4;
-//         cout << "size: " << size << endl;
-        _spill_size.push_back(_curPos - _spill_pos.back() - 4);
-      }
-
-      _spill_pos.push_back(_curPos-4);
-    }
-  }
-
-  this->reset();
+  _eventBuffer = nullptr;
+  _ifs.close();
 }
 
 char* MDdateFile::GetNextEvent() {
+  _curPos = _ifs.tellg();
+  if ( _nBytesRead < _fileSize ) {
+    delete _eventBuffer;
+    _eventBuffer = nullptr;
 
-  if ( (unsigned int)(++_lastSpill) >= _spill_size.size() )
-   return NULL;
-
-  uint32_t spillSize = _spill_size[_lastSpill];
-  uint32_t spillPos  = _spill_pos[_lastSpill];
-  cout << "GetNextEvent  pos: " << spillPos/4 << "  size: " << spillSize/4 
-       << " in DW units (4 bytes)" << endl;
-  return GetSpill(spillPos, spillSize);
-}
-
-void MDdateFile::GoTo(uint32_t pos) {
-  _ifs.seekg (pos , ios::beg);
-}
-
-char* MDdateFile::GetSpill(uint32_t pos, uint32_t size) {
-  _ifs.seekg (pos , ios::beg);
-
-  if (_eventBuffer) delete _eventBuffer;
-    _eventBuffer = new char[size];
-
-  if ( !_ifs.read(_eventBuffer, size ) ) { // read full Spill event
-    throw MDexception("Unexpected End of File while trying to read event");
-//     cerr << "Unexpected End of File while trying to read event" << endl;
-//     cerr << _ifs.gcount() << " bits read.\n";
-//     return NULL;
+    if  ( !_ifs.read( ( char* ) &_eventSize, sizeof( _eventSize ) ) ) { // read event size
+      cerr << "Unexpected End of File while trying to read event Size" << endl;
+      return nullptr;
+    } else { // read OK, go back to previous position
+      _ifs.seekg (_curPos , ios::beg);
+      _nBytesRead += sizeof( _eventSize );
+      cout << " Event size " << _eventSize << endl;
+      if ( _eventSize ) { // allocate memory for the event
+        _eventBuffer = new char[_eventSize];
+        if ( _eventBuffer == nullptr )  {
+          cerr << "Memory allocation failed in MDdateFile::GetNextEvent()" << endl;
+          return nullptr;
+        }
+        if  ( !_ifs.read( (char*)_eventBuffer, _eventSize ) ) { // read full DAQ event
+          cerr << "Unexpected End of File while trying to read event" << endl;
+          return nullptr;
+        } else { // read OK
+          _nBytesRead += _eventSize;
+          return _eventBuffer;
+        }
+      } else {
+        return nullptr;
+      }
+    }
+  } else {
+    return nullptr;
   }
+}
 
-  return _eventBuffer;
+void MDdateFile::GoTo(size_t pos) {
+  _ifs.seekg (pos , ios::beg);
 }
 
 void MDdateFile::reset() {
@@ -129,5 +110,4 @@ void MDdateFile::reset() {
   _nBytesRead = 0;
   _ifs.clear();
   _ifs.seekg (0, ios::beg);
-  _lastSpill = -1;
 }

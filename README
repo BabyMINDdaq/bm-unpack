@@ -1,18 +1,22 @@
-1. I assume that you already have a ROOT installation and ROOTSYS is set.
+About:
+------------------------------------------------------------
+BM-UNPACK is part of BabyMINDdaq software package. The software provides
+unpacking of the binary data, recorded by the Baby MIND neutrino detector.
+BM-UNPACK is designed for internal use for the Baby MIND detector collaboration
+and is tailored for this use primarily.
 
-2. To build the library do:
+Third Party Software:
+------------------------------------------------------------
+I assume that you already have a ROOT installation and ROOTSYS is set.
+  https://root.cern.ch/
+
+
+Install:
+------------------------------------------------------------
+To build the library do:
   cd build
   cmake ../
   make
-
-3.  To run the examples do:
-  cd ../bin/
-  ./dump -f 1.daq
-
-or
-  ./unpack -f 1.daq
-
-use "--help" to see the other options.
 
 
 

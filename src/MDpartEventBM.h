@@ -20,11 +20,7 @@
 #ifndef __MDPARTEVENT_BM_H
 #define __MDPARTEVENT_BM_H
 
-
-#include <stdlib.h>
 #include <vector>
-#include <stdio.h>
-#include <iostream>
 
 #include "MDdataContainer.h"
 #include "MDdataWordBM.h"
@@ -32,15 +28,14 @@
 #define BM_FEB_NCHANNELS 96
 
 class MDpartEventBM : public MDdataContainer {
-
- public:
-
-  MDpartEventBM(void *d = 0);
+public:
+  MDpartEventBM();
+  MDpartEventBM(void *d, size_t aSize=0);
   virtual ~MDpartEventBM() {}
 
 
-  void SetDataPtr(void *d, uint32_t aSize=0);
-  void Dump();
+  void SetDataPtr(void *d, size_t aSize=0) override;
+  void Dump() override;
   void Init();
 
   void AddTimeHit(MDdataWordBM &dw);

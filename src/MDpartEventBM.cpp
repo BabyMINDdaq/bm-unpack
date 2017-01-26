@@ -17,22 +17,26 @@
  *
  */
 
+#include <iostream>
+#include <sstream>
+
 #include "MDpartEventBM.h"
+#include "MDexception.h"
 
 using namespace std;
+MDpartEventBM::MDpartEventBM()
+: MDdataContainer(), _triggerTag(-1),_nDataWords(0), _trigEvents(0) {}
 
-MDpartEventBM::MDpartEventBM(void *d):MDdataContainer(d),
-  _triggerTag(-1),_nDataWords(0), _trigEvents(0) {}
+MDpartEventBM::MDpartEventBM(void *d, size_t s)
+: MDdataContainer(d, s), _triggerTag(-1),_nDataWords(0), _trigEvents(0) {}
 
-void MDpartEventBM::SetDataPtr( void *d, uint32_t aSize ) {
+void MDpartEventBM::SetDataPtr( void *d, size_t aSize ) {
   MDdataContainer::SetDataPtr(d);
   this->Init();
 }
 
 void MDpartEventBM::Init() {
   //   cout << " Calling MDpartEventBM::Init() " << endl;
-  this->UnValidate();
-
   for (int ich=0 ; ich < BM_FEB_NCHANNELS ; ich++) {
     _nLeadingEdgeHits[ich]=0;
     _nTrailingEdgeHits[ich]=0;
@@ -53,89 +57,84 @@ void MDpartEventBM::Init() {
   unsigned int * ptr = Get32bWordPtr(0);
   MDdataWordBM dw(ptr);
 //   cout << dw << endl;
-  if ( dw.IsValid() ) {
-    // Check the reliability of the header and decode the header information.
-    if (dw.GetDataType() != MDdataWordBM::TrigHeader ) { // The data doesn't start with a header
-      throw MDexception("ERROR in MDpartEventBM::Init() : 1st word is not a trigger header");
-    } else {
-      _triggerTag = dw.GetTriggerTag();
-      _triggerTagId = dw.GetTriggerTagShort();
+  // Check the reliability of the header and decode the header information.
+  if (dw.GetDataType() != MDdataWordBM::TrigHeader ) { // The data doesn't start with a header
+    throw MDexception("ERROR in MDpartEventBM::Init() : 1st word is not a trigger header");
+  } else {
+    _triggerTag = dw.GetTriggerTag();
+    _triggerTagId = dw.GetTriggerTagShort();
 
-      bool done(false);
-      while (!done) {
-        dw.SetDataPtr(++ptr);
-        _size += 4;
-//         cout << dw << endl;
-        int dataType = dw.GetDataType();
-        switch (dataType) {
-          case MDdataWordBM::TimeMeas :
-            if (dw.GetTagId() == _triggerTagId) {
-              this->AddTimeHit(dw);
-              ++_nDataWords;
-            } else {
-              if (_trigEvents) {
-                int nTr = _trigEvents->size(), lastPending;
-                lastPending = (nTr > 3) ? nTr-4 : 0;
-                for (int i = nTr-1; i >= lastPending; --i) {
-                  if (_trigEvents->at(i)->GetTriggerTagId() == dw.GetTagId()) {
-                    _trigEvents->at(i)->AddTimeHit(dw);
-                    break;
-                  }
-                }
-              }
-            }
-
-            break;
-
-          case MDdataWordBM::ChargeMeas :
-            if (dw.GetTagId() == _triggerTagId) {
-              this->AddAmplitudeHit(dw);
-              ++_nDataWords;
-            } else {
-              if (_trigEvents) {
-                int nTr = _trigEvents->size(), lastPending;
-                lastPending = (nTr > 3) ? nTr-4 : 0;
-                for (int i = nTr-1; i >= lastPending; --i) {
-                  if (_trigEvents->at(i)->GetTriggerTagId() == dw.GetTagId()) {
-                    _trigEvents->at(i)->AddAmplitudeHit(dw);
-                    break;
-                  }
-                }
-              }
-            }
-
-            break;
-
-          case MDdataWordBM::TrigTrailer1 :
-            done = true;
-            ++_nDataWords;
-            break;
-
-          default :
-            stringstream ss;
-            ss << "ERROR in MDpartEventBM::Init() : Unexpected data word (id: "
-               << dw.GetDataType() << ")";
-            cout << dw << endl;
-            throw MDexception(ss.str());
-            break;
-        }
-      }
-
-      if (dw.GetTriggerTag() != _triggerTag) {
-        stringstream ss;
-        ss << "ERROR in MDpartEventBM::Init() : The trigger trailer is not consistent \n(Trigger tag: "
-           << dw.GetTriggerTag() << "!=" << _triggerTag << ")";
-        throw MDexception(ss.str());
-      }
+    bool done(false);
+    while (!done) {
       dw.SetDataPtr(++ptr);
-      ++_nDataWords;
-      _size +=4;
-      _triggerTime = dw.GetTriggerTime();
-      _hitCount = dw.GetHitCount();
-    }
-  }
+      _size += 4;
+//         cout << dw << endl;
+      int dataType = dw.GetDataType();
+      switch (dataType) {
+        case MDdataWordBM::TimeMeas :
+          if (dw.GetTagId() == _triggerTagId) {
+            this->AddTimeHit(dw);
+            ++_nDataWords;
+          } else {
+            if (_trigEvents) {
+              int nTr = _trigEvents->size(), lastPending;
+              lastPending = (nTr > 3) ? nTr-4 : 0;
+              for (int i = nTr-1; i >= lastPending; --i) {
+                if (_trigEvents->at(i)->GetTriggerTagId() == dw.GetTagId()) {
+                  _trigEvents->at(i)->AddTimeHit(dw);
+                  break;
+                }
+              }
+            }
+          }
 
-  this->Validate();
+          break;
+
+        case MDdataWordBM::ChargeMeas :
+          if (dw.GetTagId() == _triggerTagId) {
+            this->AddAmplitudeHit(dw);
+            ++_nDataWords;
+          } else {
+            if (_trigEvents) {
+              int nTr = _trigEvents->size(), lastPending;
+              lastPending = (nTr > 3) ? nTr-4 : 0;
+              for (int i = nTr-1; i >= lastPending; --i) {
+                if (_trigEvents->at(i)->GetTriggerTagId() == dw.GetTagId()) {
+                    _trigEvents->at(i)->AddAmplitudeHit(dw);
+                  break;
+                }
+              }
+            }
+          }
+
+          break;
+
+        case MDdataWordBM::TrigTrailer1 :
+          done = true;
+          ++_nDataWords;
+          break;
+
+        default :
+          stringstream ss;
+          ss << "ERROR in MDpartEventBM::Init() : Unexpected data word (id: "
+             << dw.GetDataType() << ")";
+          cout << dw << endl;
+          throw MDexception(ss.str());
+      }
+    }
+
+    if (dw.GetTriggerTag() != _triggerTag) {
+      stringstream ss;
+      ss << "ERROR in MDpartEventBM::Init() : The trigger trailer is not consistent \n(Trigger tag: "
+         << dw.GetTriggerTag() << "!=" << _triggerTag << ")";
+      throw MDexception(ss.str());
+    }
+    dw.SetDataPtr(++ptr);
+    ++_nDataWords;
+   _size +=4;
+   _triggerTime = dw.GetTriggerTime();
+   _hitCount = dw.GetHitCount();
+  }
 }
 
 void MDpartEventBM::AddTimeHit(MDdataWordBM &dw) {
@@ -265,7 +264,6 @@ unsigned int  MDpartEventBM::GetHitTimeId(unsigned int ih, unsigned int ich, cha
   return rv;
 }
 
-
 unsigned int  MDpartEventBM::GetHitAmplitude(unsigned int ich, char t) {
   int rv = 0xFFFFFFFF ;
   if ( ich > BM_FEB_NCHANNELS-1 ) {
@@ -327,8 +325,6 @@ unsigned int  MDpartEventBM::GetHitAmplitudeId(unsigned int ich, char t) {
 void MDpartEventBM::Dump() {
   cout << *this;
 }
-
-
 
 ostream &operator<<(std::ostream &s, MDpartEventBM &pe) {
 

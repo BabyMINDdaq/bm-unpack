@@ -17,28 +17,27 @@
  *
  */
 
-#ifndef __MDEXCEPTION_H
-#define __MDEXCEPTION_H
+#ifndef _MDEVENT_H_
+#define _MDEVENT_H_ 1
 
-#include <string>
+#include "MDdataContainer.h"
+#include "BMDDataHeaders.h"
 
-class MDexception {
+class MDevent : public MDdataContainer {
 public:
-  enum MD_SEVERITY {
-    WARNING=0,
-    SERIOUS=1,
-    FATAL=2
-  };
+  MDevent() : MDdataContainer() {}
+  MDevent(void *d, size_t s=1) : MDdataContainer(d, s) {}
+  virtual ~MDevent() {}
 
-  MDexception(const std::string & aErrorDescription = "",MD_SEVERITY = SERIOUS );
-  // Default destructor has nothing to do
-  // except be declared virtual and non-throwing.
-  ~MDexception() throw() {}
-  std::string GetDescription() {return mErrorDescription;}
+  void SetDataPtr(void *d, size_t s=1) override;
 
-protected: // sometimes derived classes want to manipulate this one
-  std::string mErrorDescription;
-  MD_SEVERITY mSeverity;
+  BMDEventHeader* HeaderPtr() {
+    return reinterpret_cast<BMDEventHeader*>(_data);
+  }
+
+  uint8_t* PayLoadPtr() {
+    return _data + sizeof(BMDEventHeader);
+  }
 };
 
 #endif

@@ -20,20 +20,19 @@
 #ifndef __MDDATWORD_BM_H
 #define __MDDATWORD_BM_H
 
-#include "MDdataWord.h"
-// #include "MDTypes.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <iostream>
 #include <fstream>
 
-class MDdataWordBM : public MDdataWord {
+#include "MDdataContainer.h"
 
- public:
+class MDdataWordBM : public MDdataWord {
+public:
   MDdataWordBM(void *d=0) : MDdataWord(d) {}
   virtual ~MDdataWordBM() {}
 
-  void Dump();
+  void Dump() override;
 
   uint32_t GetDataType();
   uint32_t GetSid();
@@ -72,8 +71,7 @@ class MDdataWordBM : public MDdataWord {
     Baseline     = 6
   };
 
- private:
-
+private:
   enum DWBMMask {
    DataTypeMask     = 0xF0000000,
    SidMask          = 0x000C0000,

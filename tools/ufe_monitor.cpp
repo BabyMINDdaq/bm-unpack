@@ -31,7 +31,6 @@
 #include "TH1D.h"
 
 #include "MDdataWordBM.h"
-#include "MDargumentHandler.h"
 
 using namespace std;
 

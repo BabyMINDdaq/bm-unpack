@@ -21,25 +21,11 @@
 #define __MDDATEFILE_H
 
 #include <string>
-#include <stdint.h>
-#include <iostream>
 #include <fstream>
-#include <vector>
 
 class MDdateFile {
- protected:
-  std::ifstream          _ifs;               // Input File Stream
-  char*                  _eventBuffer;
-
- public:
-  std::string            _filePath;
-  std::string            _fileName;
-  uint32_t               _curPos;            // current stream position in file
-  uint32_t               _fileSize;
-  uint32_t               _nBytesRead;
-
-  int                    _lastSpill;
-
+public:
+  MDdateFile();
   MDdateFile(std::string fn, std::string fp=".");
   ~MDdateFile();
 
@@ -49,25 +35,28 @@ class MDdateFile {
   void SetFilePath(std::string fp) { _filePath = fp ;}
   std::string GetFilePath()        { return _filePath;}
 
-
   bool  open();
   void  close();
 
-  void  init();
   char* GetNextEvent();
 
-  uint32_t GetStreamPos() {
+  size_t GetStreamPos() {
     _curPos = _ifs.tellg();
     return _curPos;
   }
-  void GoTo(uint32_t pos);
-  char* GetSpill(uint32_t pos, uint32_t size);
 
+  void GoTo(size_t pos);
   void reset();
 
  private:
-  std::vector<uint32_t> _spill_pos;
-  std::vector<uint32_t> _spill_size;
+  std::ifstream _ifs;               // Input File Stream
+  char         *_eventBuffer;
+  std::string   _filePath;
+  std::string   _fileName;
+  size_t        _curPos;            // current stream position in file
+  size_t        _fileSize;
+  size_t        _eventSize;
+  size_t        _nBytesRead;
 };
 
 #endif
