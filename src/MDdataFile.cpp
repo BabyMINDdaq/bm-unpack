@@ -22,20 +22,20 @@
 #include "MDexception.h"
 
 using namespace std;
-MDdateFile::MDdateFile()
+MDdataFile::MDdataFile()
 :_eventBuffer(nullptr),_filePath("."), _fileName("0.000"),
  _curPos(0),_fileSize(0), _eventSize(0), _nBytesRead(0) {}
 
-MDdateFile::MDdateFile(string fn, string fp)
+MDdataFile::MDdataFile(string fn, string fp)
 :_eventBuffer(nullptr),_filePath(fp), _fileName(fn),
  _curPos(0),_fileSize(0), _eventSize(0), _nBytesRead(0) {}
 
-MDdateFile::~MDdateFile() {
+MDdataFile::~MDdataFile() {
   if (_eventBuffer)
     delete _eventBuffer;
 }
 
-bool MDdateFile::open() {
+bool MDdataFile::Open() {
 
   string fullName = _filePath + "/" + _fileName;
 
@@ -58,7 +58,7 @@ bool MDdateFile::open() {
   return true;
 }
 
-void MDdateFile::close() {
+void MDdataFile::Close() {
   if (_eventBuffer)
     delete _eventBuffer;
 
@@ -66,7 +66,7 @@ void MDdateFile::close() {
   _ifs.close();
 }
 
-char* MDdateFile::GetNextEvent() {
+char* MDdataFile::GetNextEvent() {
   _curPos = _ifs.tellg();
   if ( _nBytesRead < _fileSize ) {
     delete _eventBuffer;
@@ -82,7 +82,7 @@ char* MDdateFile::GetNextEvent() {
       if ( _eventSize ) { // allocate memory for the event
         _eventBuffer = new char[_eventSize];
         if ( _eventBuffer == nullptr )  {
-          cerr << "Memory allocation failed in MDdateFile::GetNextEvent()" << endl;
+          cerr << "Memory allocation failed in MDdataFile::GetNextEvent()" << endl;
           return nullptr;
         }
         if  ( !_ifs.read( (char*)_eventBuffer, _eventSize ) ) { // read full DAQ event
@@ -101,11 +101,11 @@ char* MDdateFile::GetNextEvent() {
   }
 }
 
-void MDdateFile::GoTo(size_t pos) {
+void MDdataFile::GoTo(size_t pos) {
   _ifs.seekg (pos , ios::beg);
 }
 
-void MDdateFile::reset() {
+void MDdataFile::Reset() {
   /* go back to the begining */
   _nBytesRead = 0;
   _ifs.clear();

@@ -17,17 +17,17 @@
  *
  */
 
-#ifndef __MDDATEFILE_H
-#define __MDDATEFILE_H
+#ifndef __MDDATAFILE_H
+#define __MDDATAFILE_H
 
 #include <string>
 #include <fstream>
 
-class MDdateFile {
+class MDdataFile {
 public:
-  MDdateFile();
-  MDdateFile(std::string fn, std::string fp=".");
-  ~MDdateFile();
+  MDdataFile();
+  MDdataFile(std::string fn, std::string fp=".");
+  ~MDdataFile();
 
   void SetFileName(std::string fn) { _fileName = fn ;}
   std::string GetFileName()        { return _fileName;}
@@ -35,8 +35,8 @@ public:
   void SetFilePath(std::string fp) { _filePath = fp ;}
   std::string GetFilePath()        { return _filePath;}
 
-  bool  open();
-  void  close();
+  bool  Open();
+  void  Close();
 
   char* GetNextEvent();
 
@@ -46,7 +46,7 @@ public:
   }
 
   void GoTo(size_t pos);
-  void reset();
+  void Reset();
 
  private:
   std::ifstream _ifs;               // Input File Stream
